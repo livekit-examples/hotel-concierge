@@ -1,6 +1,8 @@
 import BlockForm from "@/app/admin/BlockForm";
 import { query } from "@/app/lib/db";
 
+export const dynamic = "force-dynamic";
+
 type RoomRow = {
   id: string;
   name: string;
@@ -65,6 +67,17 @@ type DiningRow = {
   created_at: string;
 };
 
+type MissingRelationError = {
+  code?: string;
+};
+
+function isMissingRelationError(error: unknown): error is MissingRelationError {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  return "code" in error && (error as MissingRelationError).code === "42P01";
+}
+
 function formatDate(date: string) {
   const parsed = new Date(date);
   if (Number.isNaN(parsed.getTime())) return date;
@@ -76,6 +89,20 @@ function formatDate(date: string) {
 }
 
 export default async function AdminPage() {
+  let diningTableMissing = false;
+  const diningPromise = query<DiningRow>(
+    `SELECT id, confirmation_id, venue, reservation_date, reservation_time, party_size, name, email, phone, status, created_at
+     FROM dining_reservations
+     ORDER BY created_at DESC
+     LIMIT 20`
+  ).catch((error: unknown) => {
+    if (isMissingRelationError(error)) {
+      diningTableMissing = true;
+      return { rows: [], rowCount: 0 };
+    }
+    throw error;
+  });
+
   const [
     roomsResult,
     bookingsResult,
@@ -119,12 +146,7 @@ export default async function AdminPage() {
          ORDER BY start_date DESC
          LIMIT 20`
       ),
-      query<DiningRow>(
-        `SELECT id, confirmation_id, venue, reservation_date, reservation_time, party_size, name, email, phone, status, created_at
-         FROM dining_reservations
-         ORDER BY created_at DESC
-         LIMIT 20`
-      ),
+      diningPromise,
       query<{ total_rooms: number; total_bookings: number; upcoming: number }>(
         `SELECT
            (SELECT COUNT(*)::int FROM rooms) AS total_rooms,
@@ -426,7 +448,9 @@ export default async function AdminPage() {
           ))}
           {diningResult.rows.length === 0 && (
             <p className="text-sm text-sage">
-              No dining reservations yet.
+              {diningTableMissing
+                ? "Dining reservations table is missing. Run db/schema.sql."
+                : "No dining reservations yet."}
             </p>
           )}
         </div>

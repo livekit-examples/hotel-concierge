@@ -14,6 +14,8 @@ const sanitizedUrl = (() => {
   try {
     const url = new URL(connectionString);
     url.searchParams.delete("channel_binding");
+    url.searchParams.delete("sslmode");
+    url.searchParams.delete("uselibpqcompat");
     return url.toString();
   } catch {
     return connectionString;
