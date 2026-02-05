@@ -1,6 +1,7 @@
 import BookingPageClient from "@/app/booking/BookingPageClient";
 import { query } from "@/app/lib/db";
 import { rooms as fallbackRooms, type Room } from "@/app/lib/hotel-data";
+import { Suspense } from "react";
 
 type RoomRow = {
   id: string;
@@ -53,5 +54,9 @@ export default async function BookingPage() {
     amenities: amenityLookup.get(room.id) ?? [],
   }));
 
-  return <BookingPageClient rooms={rooms} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f6f1e8]" />}>
+      <BookingPageClient rooms={rooms} />
+    </Suspense>
+  );
 }
