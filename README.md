@@ -26,7 +26,7 @@ psql "$DATABASE_URL" -f db/seed.sql
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://hotel-concierge.staging.livekit.io` in your browser.
 
 ## Environment
 
@@ -71,7 +71,7 @@ npm run build-embed-popup-script
 cp public/embed-popup.js ../public/embed-popup.js
 ```
 
-If you deploy the hotel app somewhere other than `http://localhost:3000`,
+If you deploy the hotel app somewhere other than `http://hotel-concierge.staging.livekit.io`,
 set `NEXT_PUBLIC_CONN_DETAILS_ENDPOINT` in
 `livehotel-embed-agent/.env.local` before building so the bundle points to the
 correct domain.

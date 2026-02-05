@@ -70,7 +70,7 @@ pnpm build-embed-popup-script # Builds the embed-popup.js script
 pnpm dev
 ```
 
-Open http://localhost:3000 in your browser to experience the 2 embeddable demos.
+Open http://hotel-concierge.staging.livekit.io in your browser to experience the 2 embeddable demos.
 
 You'll also need an agent to speak with. Try our starter agent for [Python](https://github.com/livekit-examples/agent-starter-python), [Node.js](https://github.com/livekit-examples/agent-starter-node), or [create your own from scratch](https://docs.livekit.io/agents/start/voice-ai/).
 
@@ -103,14 +103,14 @@ LIVEKIT_API_KEY=your_livekit_api_key
 LIVEKIT_API_SECRET=your_livekit_api_secret
 LIVEKIT_URL=https://your-livekit-server-url
 
-NEXT_PUBLIC_CONN_DETAILS_ENDPOINT=http://localhost:3000/api/connection-details
+NEXT_PUBLIC_CONN_DETAILS_ENDPOINT=http://hotel-concierge.staging.livekit.io/api/connection-details
 ```
 
 These are required for the voice agent functionality to work with your LiveKit project.
 
 ## Local Development
 
-http://localhost:3000 will respond to code changes in real time through [NextJS Fast Refresh](https://nextjs.org/docs/architecture/fast-refresh) to support a rapid iteration feedback loop.
+http://hotel-concierge.staging.livekit.io will respond to code changes in real time through [NextJS Fast Refresh](https://nextjs.org/docs/architecture/fast-refresh) to support a rapid iteration feedback loop.
 
 ## Production deployment of embed-popup.js script
 
@@ -121,7 +121,7 @@ Once your environment is set up and you've made any configuration changes, you c
 
 ## Debugging the build of embed-popup.js script
 
-You can test and debug your latest build of `embed-popup.js` locally at http://localhost:3000/test/popup.
+You can test and debug your latest build of `embed-popup.js` locally at http://hotel-concierge.staging.livekit.io/test/popup.
 
 > [!IMPORTANT]
 > Code changes you make locally will not be reflected in the bundled `embed-popup.js` script until you run `pnpm build-embed-popup-script`.

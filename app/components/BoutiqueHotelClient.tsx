@@ -897,7 +897,7 @@ export default function BoutiqueHotelClient({ initialData }: Props) {
                 Sample request
               </p>
               <pre className="mt-3 whitespace-pre-wrap text-xs text-amber-100/90">
-{`curl -X POST http://localhost:3000/api/bookings \\
+{`curl -X POST http://hotel-concierge.staging.livekit.io/api/bookings \\
   -H "Content-Type: application/json" \\
   -d '{"roomId":"harbor-suite","checkIn":"2026-03-12","checkOut":"2026-03-14","guests":2,"name":"Jordan Blake","email":"jordan@example.com"}'`}
               </pre>
