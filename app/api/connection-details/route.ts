@@ -6,6 +6,7 @@ import { handleOptions, withCors } from "@/app/lib/api";
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_URL = process.env.LIVEKIT_URL;
+const DEFAULT_AGENT_NAME = process.env.LIVEKIT_AGENT_NAME ?? "hotel-agent";
 
 export const revalidate = 0;
 
@@ -33,7 +34,8 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const agentName: string | undefined = body?.room_config?.agents?.[0]?.agent_name;
+    const requestedAgentName: string | undefined = body?.room_config?.agents?.[0]?.agent_name;
+    const agentName = requestedAgentName || DEFAULT_AGENT_NAME;
 
     const participantName = "guest";
     const participantIdentity = `hotel_guest_${Math.floor(Math.random() * 10_000)}`;

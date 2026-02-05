@@ -4,6 +4,7 @@ import { ConnectionDetails } from '@/app/api/connection-details/route';
 import { AppConfig } from '@/lib/types';
 
 const ONE_MINUTE_IN_MILLISECONDS = 60 * 1000;
+const DEFAULT_AGENT_NAME = 'hotel-agent';
 
 export default function useConnectionDetails(appConfig: AppConfig) {
   // Generate room connection details, including:
@@ -54,6 +55,8 @@ export default function useConnectionDetails(appConfig: AppConfig) {
     setConnectionDetails(null);
     const url = getConnectionDetailsUrl();
 
+    const agentName = appConfig.agentName ?? DEFAULT_AGENT_NAME;
+
     let data: ConnectionDetails;
     try {
       const res = await fetch(url.toString(), {
@@ -63,9 +66,9 @@ export default function useConnectionDetails(appConfig: AppConfig) {
           'X-Sandbox-Id': appConfig.sandboxId ?? '',
         },
         body: JSON.stringify({
-          room_config: appConfig.agentName
+          room_config: agentName
             ? {
-                agents: [{ agent_name: appConfig.agentName }],
+                agents: [{ agent_name: agentName }],
               }
             : undefined,
         }),
