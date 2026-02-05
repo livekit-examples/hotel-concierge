@@ -17,17 +17,42 @@ export default function useConnectionDetails(appConfig: AppConfig) {
 
   const [connectionDetails, setConnectionDetails] = useState<ConnectionDetails | null>(null);
 
+  const getConnectionDetailsUrl = useCallback(() => {
+    const rawEndpoint = process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT;
+    const sameOriginUrl = new URL('/api/connection-details', window.location.origin);
+
+    let endpoint: URL;
+    try {
+      endpoint = new URL(rawEndpoint ?? sameOriginUrl.toString(), window.location.origin);
+    } catch {
+      endpoint = sameOriginUrl;
+    }
+
+    // Avoid mixed-content failures when the host app is served over HTTPS.
+    // If the configured endpoint is insecure and cross-origin, force same-origin.
+    if (window.location.protocol === 'https:' && endpoint.protocol === 'http:') {
+      if (endpoint.hostname === window.location.hostname) {
+        endpoint.protocol = 'https:';
+      } else {
+        endpoint = sameOriginUrl;
+      }
+    }
+
+    // Local dev endpoint accidentally bundled into a production host.
+    if (
+      (endpoint.hostname === 'localhost' || endpoint.hostname === '127.0.0.1') &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      endpoint = sameOriginUrl;
+    }
+
+    return endpoint;
+  }, []);
+
   const fetchConnectionDetails = useCallback(async () => {
     setConnectionDetails(null);
-    let url: URL;
-    try {
-      url = new URL(
-        process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details',
-        window.location.origin
-      );
-    } catch {
-      url = new URL('/api/connection-details', window.location.origin);
-    }
+    const url = getConnectionDetailsUrl();
 
     let data: ConnectionDetails;
     try {
@@ -53,7 +78,7 @@ export default function useConnectionDetails(appConfig: AppConfig) {
 
     setConnectionDetails(data);
     return data;
-  }, []);
+  }, [appConfig.agentName, appConfig.sandboxId, getConnectionDetailsUrl]);
 
   useEffect(() => {
     fetchConnectionDetails();
