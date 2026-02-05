@@ -131,7 +131,7 @@ export default async function AdminPage() {
            (SELECT COUNT(*)::int FROM bookings) AS total_bookings,
            (SELECT COUNT(*)::int FROM bookings WHERE check_in >= CURRENT_DATE) AS upcoming`
       ),
-    ]);
+    ] as const);
 
   const bookingIds = bookingsResult.rows.map((row) => row.id);
   const roomsByBooking = new Map<number, BookingRoomRow[]>();

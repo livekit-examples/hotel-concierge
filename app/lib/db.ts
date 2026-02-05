@@ -32,8 +32,16 @@ if (process.env.NODE_ENV !== "production") {
   globalForPool.pgPool = pool;
 }
 
-export async function query<T>(text: string, params?: Array<unknown>) {
-  return pool.query<T>(text, params);
+type QueryResultRows<T> = {
+  rows: T[];
+  rowCount: number | null;
+};
+
+export async function query<T = Record<string, unknown>>(
+  text: string,
+  params?: Array<unknown>
+): Promise<QueryResultRows<T>> {
+  return pool.query(text, params) as Promise<QueryResultRows<T>>;
 }
 
 export async function withTransaction<T>(
