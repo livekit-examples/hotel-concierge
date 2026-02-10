@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Room, RoomEvent, type RpcInvocationData } from 'livekit-client';
 import { motion, useDragControls } from 'motion/react';
 import { RoomAudioRenderer, RoomContext, StartAudio } from '@livekit/components-react';
+import { XIcon } from '@phosphor-icons/react';
 import { ErrorMessage } from '@/components/embed-popup/error-message';
 import { PopupView } from '@/components/embed-popup/popup-view';
 import { Trigger } from '@/components/embed-popup/trigger';
@@ -31,6 +32,7 @@ function AgentClient({ appConfig }: EmbedFixedAgentClientProps) {
   const room = useMemo(() => new Room(), []);
   const [popupOpen, setPopupOpen] = useState(false);
   const [error, setError] = useState<EmbedErrorDetails | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const { connectionDetails, refreshConnectionDetails, existingOrRefreshConnectionDetails } =
     useConnectionDetails(appConfig);
 
@@ -339,6 +341,14 @@ function AgentClient({ appConfig }: EmbedFixedAgentClientProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   const startResize =
     (corner: 'se' | 'sw' | 'ne' | 'nw') => (event: React.PointerEvent) => {
       event.preventDefault();
@@ -364,21 +374,25 @@ function AgentClient({ appConfig }: EmbedFixedAgentClientProps) {
           inert={!popupOpen}
           initial={{
             opacity: 0,
-            translateY: 8,
+            translateY: isMobile ? '100%' : 8,
           }}
           animate={{
             opacity: popupOpen ? 1 : 0,
-            translateY: popupOpen ? 0 : 8,
+            translateY: popupOpen ? (isMobile ? '0%' : 0) : isMobile ? '100%' : 8,
           }}
           transition={{
             type: 'spring',
             bounce: 0,
-            duration: popupOpen ? 1 : 0.2,
+            duration: popupOpen ? (isMobile ? 0.4 : 1) : 0.2,
           }}
           onAnimationStart={handlePanelAnimationStart}
           onAnimationComplete={handlePanelAnimationComplete}
-          className="pointer-events-auto fixed right-4 bottom-20 left-4 md:left-auto"
-          drag
+          className={
+            isMobile
+              ? 'pointer-events-auto fixed bottom-0 left-0 right-0'
+              : 'pointer-events-auto fixed right-4 bottom-20 left-4 md:left-auto'
+          }
+          drag={!isMobile}
           dragListener={false}
           dragControls={dragControls}
           dragConstraints={dragConstraints}
@@ -386,43 +400,69 @@ function AgentClient({ appConfig }: EmbedFixedAgentClientProps) {
           dragElastic={0.08}
         >
           <div
-            className="bg-bg1 dark:bg-bg2 border-separator1 dark:border-separator2 relative ml-auto w-full rounded-[28px] border border-solid drop-shadow-md"
-            style={{ width: panelSize.width, height: panelSize.height }}
+            className={
+              isMobile
+                ? 'bg-bg1 dark:bg-bg2 border-separator1 dark:border-separator2 relative w-full rounded-t-[28px] border-t border-x border-solid drop-shadow-md'
+                : 'bg-bg1 dark:bg-bg2 border-separator1 dark:border-separator2 relative ml-auto w-full rounded-[28px] border border-solid drop-shadow-md'
+            }
+            style={
+              isMobile
+                ? { height: '33vh' }
+                : { width: panelSize.width, height: panelSize.height }
+            }
           >
-            <div
-              className="border-separator1 dark:border-separator2 absolute left-0 right-0 top-0 z-10 flex h-8 items-center justify-between border-b border-solid px-4 text-[10px] uppercase tracking-[0.3em] text-fg3"
-              onPointerDown={(event) => dragControls.start(event)}
-              role="button"
-              tabIndex={0}
-              aria-label="Drag concierge panel"
-            >
-              <span>Concierge</span>
-              <span className="text-fg4">Drag</span>
-            </div>
-            <button
-              type="button"
-              aria-label="Resize panel"
-              onPointerDown={startResize('se')}
-              className="absolute bottom-2 right-2 z-20 h-4 w-4 cursor-nwse-resize rounded-full border border-separator1 bg-bg2/80"
-            />
-            <button
-              type="button"
-              aria-label="Resize panel"
-              onPointerDown={startResize('sw')}
-              className="absolute bottom-2 left-2 z-20 h-4 w-4 cursor-nesw-resize rounded-full border border-separator1 bg-bg2/80"
-            />
-            <button
-              type="button"
-              aria-label="Resize panel"
-              onPointerDown={startResize('ne')}
-              className="absolute top-10 right-2 z-20 h-4 w-4 cursor-nesw-resize rounded-full border border-separator1 bg-bg2/80"
-            />
-            <button
-              type="button"
-              aria-label="Resize panel"
-              onPointerDown={startResize('nw')}
-              className="absolute top-10 left-2 z-20 h-4 w-4 cursor-nwse-resize rounded-full border border-separator1 bg-bg2/80"
-            />
+            {isMobile ? (
+              <div className="border-separator1 dark:border-separator2 absolute left-0 right-0 top-0 z-10 flex h-8 items-center justify-between border-b border-solid px-4">
+                <div className="h-1 w-10 rounded-full bg-fg4/40" />
+                <button
+                  type="button"
+                  aria-label="Close concierge"
+                  onClick={handleTogglePopup}
+                  className="flex size-6 items-center justify-center rounded-full text-fg3 hover:text-fg1"
+                >
+                  <XIcon size={14} weight="bold" />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="border-separator1 dark:border-separator2 absolute left-0 right-0 top-0 z-10 flex h-8 items-center justify-between border-b border-solid px-4 text-[10px] uppercase tracking-[0.3em] text-fg3"
+                onPointerDown={(event) => dragControls.start(event)}
+                role="button"
+                tabIndex={0}
+                aria-label="Drag concierge panel"
+              >
+                <span>Concierge</span>
+                <span className="text-fg4">Drag</span>
+              </div>
+            )}
+            {!isMobile && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Resize panel"
+                  onPointerDown={startResize('se')}
+                  className="absolute bottom-2 right-2 z-20 h-4 w-4 cursor-nwse-resize rounded-full border border-separator1 bg-bg2/80"
+                />
+                <button
+                  type="button"
+                  aria-label="Resize panel"
+                  onPointerDown={startResize('sw')}
+                  className="absolute bottom-2 left-2 z-20 h-4 w-4 cursor-nesw-resize rounded-full border border-separator1 bg-bg2/80"
+                />
+                <button
+                  type="button"
+                  aria-label="Resize panel"
+                  onPointerDown={startResize('ne')}
+                  className="absolute top-10 right-2 z-20 h-4 w-4 cursor-nesw-resize rounded-full border border-separator1 bg-bg2/80"
+                />
+                <button
+                  type="button"
+                  aria-label="Resize panel"
+                  onPointerDown={startResize('nw')}
+                  className="absolute top-10 left-2 z-20 h-4 w-4 cursor-nwse-resize rounded-full border border-separator1 bg-bg2/80"
+                />
+              </>
+            )}
             <div className="relative h-full w-full pt-8">
               <ErrorMessage error={error} />
               {!error && (
