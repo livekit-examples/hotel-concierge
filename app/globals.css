@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --sand: #f7f2eb;
+  --cloud: #fcfaf7;
+  --ink: #1e2722;
+  --sage: #5b6f62;
+  --terracotta: #c76b4f;
+  --sea: #2b5a5f;
+  --gold: #d5b36a;
+}
+
+@theme inline {
+  --color-sand: var(--sand);
+  --color-cloud: var(--cloud);
+  --color-ink: var(--ink);
+  --color-sage: var(--sage);
+  --color-terracotta: var(--terracotta);
+  --color-sea: var(--sea);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #ffffff 0%, #f8f0e6 35%, #f4eee6 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgba(199, 107, 79, 0.25);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
