@@ -1,3 +1,6 @@
+> [!WARNING]
+> This example is archived and no longer maintained. For current examples, see [LiveKit Agents examples](https://github.com/livekit/agents/tree/main/examples) and [agent-starter-react](https://github.com/livekit-examples/agent-starter-react).
+
 # LiveKit Site Widget — Voice AI Agent with Direct Page Control
 
 A complete example of a **drop-in voice AI widget** that controls a website via direct DOM manipulation — no custom page code required. The agent navigates pages, fills forms, scrolls, clicks buttons, and completes bookings, all through a single `<script>` tag.
